@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<config>
+  <modules>
+    <Apollo_OrderManagement>
+      <version>1.0.0</version>
+      <active>true</active>
+      <codePool>local</codePool>
+    </Apollo_OrderManagement>
+  </modules>
+</config>
