@@ -90,7 +90,7 @@ class Apollo_OrderManagement_Model_Observer
     // Mage::log($order->getStatus(), null, 'apollo.log');
     // Mage::log(json_encode($data), null, 'apollo.log');
 
-    $response = $this->callAPI('POST', 'https://api.spaceinvoices.com/v1/magento-1/' . $this->integration_id . '/order', json_encode($data));
+    $response = $this->callAPI('POST', 'https://api.spaceinvoices.com/v1/magento1/' . $this->integration_id . '/order', json_encode($data));
     $response_json = json_decode($response, true);
 
     $errors = $response_json['response']['errors'];
