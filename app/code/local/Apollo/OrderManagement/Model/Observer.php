@@ -61,7 +61,7 @@ class Apollo_OrderManagement_Model_Observer
     $country = Mage::getModel('directory/country')->loadByCode($shipping_address->getCountryId());
 
     $data->shipping_address = $shipping_data;
-    $data->shipping_country->country = $country->getName();
+    $data->shipping_country = $country->getName();
 
     // Billing
     $billing_address = $order->getBillingAddress();
@@ -90,14 +90,16 @@ class Apollo_OrderManagement_Model_Observer
     // Mage::log($order->getStatus(), null, 'apollo.log');
     // Mage::log(json_encode($data), null, 'apollo.log');
 
-    $response = $this->callAPI('POST', 'https://api.spaceinvoices.com/v1/magento1/' . $this->integration_id . '/order', json_encode($data));
-    $response_json = json_decode($response, true);
+    $response = $this->callAPI('POST', 'https://api.spaceinvoices.com/v1/magento1/' . $this->integration_id . '/order', json_encode($data), $this->token);
+    $response_decoded = json_decode($response, true);
 
-    $errors = $response_json['response']['errors'];
-    $reponse_data = $response_json['response']['data'][0];
+    if ($response_decoded && $response_decoded['response']) {
+      $errors = $response_decoded['response']['errors'];
+      $reponse_data = $response_decoded['response']['data'][0];
 
-    if ($errors) {
-      Mage::log(json_encode($errors), null, 'apollo.log');
+      if ($errors) {
+        Mage::log(json_encode($errors), null, 'apollo.log');
+      }
     }
   }
 
