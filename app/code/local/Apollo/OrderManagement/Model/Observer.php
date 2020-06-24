@@ -41,18 +41,21 @@ class Apollo_OrderManagement_Model_Observer
       return;
     }
 
+    $store = $order->getStore();
+    $taxCalculation = Mage::getModel('tax/calculation');
+    $request = $taxCalculation->getRateRequest(null, null, null, $store);
+    $order_data = $order->getData();
+
     $data = (object) [
-      'order' => (object) [],
+      'order' => $order_data,
       'items' => [],
       'shipping_address' => (object) [],
       'shipping_country' => '',
+      'shipping_tax' => null,
       'billing_address' => (object) [],
       'billing_country' => '',
       'payment_type' => '',
     ];
-
-    $order_data = $order->getData();
-    $data->order = $order_data;
 
     // Shipping
     $shipping_address = $order->getShippingAddress();
@@ -71,6 +74,18 @@ class Apollo_OrderManagement_Model_Observer
 
     $data->billing_address = $billing_data;
     $data->billing_country = $country->getName();
+
+    // Shipping tax
+    $taxRateId = Mage::getStoreConfig('tax/classes/shipping_tax_class', $store);
+    $taxPercent = $taxCalculation->getRate($request->setProductClassId($taxRateId));
+    $data->shipping_tax = $taxPercent;
+
+    // et_payment_extra_charge
+    if ($data->order['et_payment_extra_charge']) {
+      $et_taxRateId = Mage::getStoreConfig('et_paymentextracharge/general/tax_class', $store);
+      $et_taxPercent = $taxCalculation->getRate($request->setProductClassId($et_taxRateId));
+      $data->et_payment_extra_charge_tax = $et_taxPercent;
+    }
 
     // Payment
     $payment = $order->getPayment()->getMethodInstance();
